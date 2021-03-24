@@ -33,3 +33,25 @@ exports.addProduct = (req,res,next) =>{
         res.status(400).send(err);
     })
 }
+
+exports.editProduct = (req,res,next)=>{
+    const title = req.body.title;
+    const price = req.body.price;
+    const description = req.body.description;
+    const imageUrl = req.body.imageUrl;
+    const product = new Product(null,title,imageUrl,description,price)
+    product.update(req.body.id).then(resp=>{
+        res.status(200).send('Product Updated Successfully');
+    }).catch(err=>{
+        res.status(400).send(err);
+    })
+}
+
+exports.deleteProduct = (req,res,next) =>{
+    const productId = req.query.id;
+    Product.deleteById(productId).then(resp=>{
+        res.status(200).send('Product Deleted Successfully');
+    }).catch((err)=>{
+        res.status(400).send(err);
+    })
+}
