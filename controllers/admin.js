@@ -48,6 +48,7 @@ exports.editProduct = (req,res,next)=>{
 }
 
 exports.deleteProduct = (req,res,next) =>{
+
     const productId = req.query.id;
     Product.deleteById(productId).then(resp=>{
         res.status(200).send('Product Deleted Successfully');
