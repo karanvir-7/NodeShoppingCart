@@ -1,8 +1,8 @@
 const Product  = require('../models/products.js');
 
 exports.getAllProducts = (req,res,next) => {
-    Product.fetchAll().then(resp=>{
-        res.status(200).send(resp[0]);
+    Product.findAll().then(resp=>{
+        res.status(200).send(resp);
     }).catch(err=>{
         res.status(400).send(err);
     })
@@ -10,15 +10,16 @@ exports.getAllProducts = (req,res,next) => {
 
 exports.getAllProductsById = (req,res,next) => {
     const id = req.query.id;
-    Product.fetchProductById(id).then(resp=>{
-        if(resp[0].length == 0){
-            res.status(200).send('No Product Found')
-        }else{
-            res.status(200).send(resp[0]);
-        }         
+    Product.findAll({
+        where:{
+            id: id
+        }
+    }).then(resp=>{
+        res.status(200).send(resp);
     }).catch(err=>{
         res.status(400).send(err);
     })
+
 }
 
 exports.addProduct = (req,res,next) =>{
@@ -26,12 +27,17 @@ exports.addProduct = (req,res,next) =>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
-    const product  = new Product(null,title,imageUrl,description,price);
-    product.save().then(resp=>{
+    Product.create({
+        title: title,
+        price: price,
+        description:description,
+        imageUrl:imageUrl
+    }).then(resp=>{
         res.status(200).send('Product Added Successfully')
     }).catch(err=>{
         res.status(400).send(err);
     })
+
 }
 
 exports.editProduct = (req,res,next)=>{
@@ -39,20 +45,33 @@ exports.editProduct = (req,res,next)=>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
-    const product = new Product(null,title,imageUrl,description,price)
-    product.update(req.body.id).then(resp=>{
+    const productId = req.body.id;
+    Product.update({ 
+        title:title,
+        price:price,
+        description:description,
+        imageUrl:imageUrl
+     },{
+        where: {
+           id: productId
+        }
+    }).then(resp=>{
         res.status(200).send('Product Updated Successfully');
     }).catch(err=>{
         res.status(400).send(err);
-    })
+    });
 }
 
 exports.deleteProduct = (req,res,next) =>{
 
     const productId = req.query.id;
-    Product.deleteById(productId).then(resp=>{
+    Product.destroy({
+        where: {
+          id: productId
+        }
+    }).then(resp=>{
         res.status(200).send('Product Deleted Successfully');
-    }).catch((err)=>{
+    }).catch(err=>{
         res.status(400).send(err);
     })
 }
