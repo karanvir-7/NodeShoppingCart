@@ -10,11 +10,7 @@ exports.getAllProducts = (req,res,next) => {
 
 exports.getAllProductsById = (req,res,next) => {
     const id = req.query.id;
-    Product.findAll({
-        where:{
-            id: id
-        }
-    }).then(resp=>{
+    Product.findByPk(id).then(resp=>{
         res.status(200).send(resp);
     }).catch(err=>{
         res.status(400).send(err);
