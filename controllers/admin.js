@@ -23,11 +23,14 @@ exports.addProduct = (req,res,next) =>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
+    // console.log(req.user[0]['dataValues']['id'],'sa')
+
     Product.create({
         title: title,
         price: price,
         description:description,
-        imageUrl:imageUrl
+        imageUrl:imageUrl,
+        userId:req.user[0]['dataValues']['id']
     }).then(resp=>{
         res.status(200).send('Product Added Successfully')
     }).catch(err=>{
@@ -46,7 +49,8 @@ exports.editProduct = (req,res,next)=>{
         title:title,
         price:price,
         description:description,
-        imageUrl:imageUrl
+        imageUrl:imageUrl,
+        userId:req.user[0]['dataValues']['id']
      },{
         where: {
            id: productId
