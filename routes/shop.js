@@ -3,8 +3,8 @@ const router = express.Router();
  
 const shopController = require('../controllers/shop')
 
-router.get('/getCartItems',shopController.getAllItems);
+router.get('/getCartItems',shopController.getCart);
 
-router.post('addItemInCart',shopController.addItem)
+router.post('/addItemInCart',shopController.addItem)
 
 module.exports = router;

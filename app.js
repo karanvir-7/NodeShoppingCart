@@ -15,11 +15,7 @@ const CartItem = require('./models/cart-item');
 app.use(express.json())
 
 app.use((req,res,next)=>{
-    User.findAll({
-        where: {
-            id:1
-        }
-    }).then(user =>{
+    User.findByPk(1).then(user =>{
         req.user = user;
         next();
     }).catch(err=>{
@@ -40,11 +36,7 @@ Cart.belongsToMany(Product, {through :CartItem});
 Product.belongsToMany(Cart, {through :CartItem});
 
 sequelize.sync().then(resp=>{
-    return User.findAll({
-        where: {
-            id:1
-        }
-    });
+    return User.findByPk(1)
 }).then(user =>{
    // console.log(user);
     if(user.length == 0){
