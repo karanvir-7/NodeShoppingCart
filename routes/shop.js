@@ -7,4 +7,10 @@ router.get('/getCartItems',shopController.getCart);
 
 router.post('/addItemInCart',shopController.addItem)
 
+router.get('/getAllProducts',shopController.getAllProducts);
+
+router.get('/getSingleProduct',shopController.getAllProductsById);
+
+router.delete('/deleteProductFromCart',shopController.deleteProductFromCart);
+
 module.exports = router;

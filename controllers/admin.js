@@ -15,7 +15,6 @@ exports.getAllProductsById = (req,res,next) => {
     }).catch(err=>{
         res.status(400).send(err);
     })
-
 }
 
 exports.addProduct = (req,res,next) =>{
@@ -23,14 +22,12 @@ exports.addProduct = (req,res,next) =>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
-    // console.log(req.user[0]['dataValues']['id'],'sa')
 
-    Product.create({
+    req.user.createProduct({
         title: title,
         price: price,
         description:description,
         imageUrl:imageUrl,
-        userId:req.user[0]['dataValues']['id']
     }).then(resp=>{
         res.status(200).send('Product Added Successfully')
     }).catch(err=>{
@@ -45,12 +42,13 @@ exports.editProduct = (req,res,next)=>{
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
     const productId = req.body.id;
+    // console.log(req.user['dataValues']['id'])
     Product.update({ 
         title:title,
         price:price,
         description:description,
         imageUrl:imageUrl,
-        userId:req.user[0]['dataValues']['id']
+        userId:req.user['dataValues']['id']
      },{
         where: {
            id: productId

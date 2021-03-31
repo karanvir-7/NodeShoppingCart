@@ -11,6 +11,8 @@ const Product = require('./models/products');
 const User = require('./models/user');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 app.use(express.json())
 
@@ -35,11 +37,15 @@ Cart.belongsTo(User)
 Cart.belongsToMany(Product, {through :CartItem});
 Product.belongsToMany(Cart, {through :CartItem});
 
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, {through:OrderItem})
+
 sequelize.sync().then(resp=>{
     return User.findByPk(1)
 }).then(user =>{
-   // console.log(user);
-    if(user.length == 0){
+    console.log(user);
+    if(!user){
         return User.create({ name:'karan',email:'karanvirvirdi186@gmail.com'});
     }
     return user;
