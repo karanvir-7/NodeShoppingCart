@@ -87,3 +87,15 @@ exports.deleteProductFromCart = (req,res,next) =>{
     res.status(400).send(err);
   });
 }
+
+
+exports.postOrder  = (req,res,next) =>{
+  req.user.getCart()
+  .then(cart =>{
+    return cart.getProducts();
+  })
+  .then(products =>{
+   console.log(products)
+  })
+  .catch();
+}
