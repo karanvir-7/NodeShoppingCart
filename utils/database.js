@@ -1,10 +1,18 @@
 
 require('dotenv').config()
-const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize(process.env.DB, process.env.DB_USER,process.env.DB_PASSWORD, {
-    host: process.env.DB_HOST,
-    dialect: 'mysql' 
-});
+const MongoClient = require('mongodb').MongoClient;
 
-module.exports = sequelize;
+const mongoConnect = (callback) =>{
+    MongoClient.connect(`mongodb+srv://shoppingUser:9779kanty@shoppingcart.vzgsg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
+    .then(client =>{
+        console.log('connected');
+        callback(client)
+    })
+    .catch(err =>{
+        console.log(err);
+    });
+}
+
+module.exports = mongoConnect;
+//mongodb+srv://<username>:<password>@shoppingcart.vzgsg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
