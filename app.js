@@ -6,11 +6,12 @@ const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/shop');
 const port = 3000;
 
-const mongoConnect = require('./utils/database');
+const mongoConnect = require('./utils/database').mongoConnect;
 
 app.use(express.json())
 
 app.use((req,res,next)=>{
+    next();
 })
 
 app.use('/admin',adminRoutes);
@@ -18,8 +19,7 @@ app.use('/user',userRoutes)
 
 
 
-mongoConnect((client)=>{
-    console.log(client);
+mongoConnect(()=>{
     app.listen(port, () => {
         console.log(`app listening at http://localhost:${port}`)
     })
