@@ -24,7 +24,6 @@ exports.addProduct = (req,res,next) =>{
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
     const obj = new Product(title,price,description,imageUrl);
-    console.log(obj)
     obj.save().then(response =>{
         console.log(response)
         res.status(200).send('product added successfully')
@@ -43,7 +42,8 @@ exports.editProduct = (req,res,next)=>{
             imageUrl : req.body.imageUrl
         } 
     }
-    
+
+    const productId = req.body.id;
     Product.updateProductDetails(productId,newvalues).then(resp=>{
         res.status(200).send('Product Updated Successfully');
     }).catch(err=>{
@@ -54,13 +54,14 @@ exports.editProduct = (req,res,next)=>{
 exports.deleteProduct = (req,res,next) =>{
 
     const productId = req.query.id;
-    Product.destroy({
-        where: {
-          id: productId
-        }
-    }).then(resp=>{
+
+    if(!productId){
+        return res.status(400).send('Please provide Product Id')
+    }
+    Product.deleteById(productId).then(resp=>{
         res.status(200).send('Product Deleted Successfully');
     }).catch(err=>{
         res.status(400).send(err);
-    })
+    });
+
 }
