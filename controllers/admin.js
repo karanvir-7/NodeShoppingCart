@@ -23,7 +23,8 @@ exports.addProduct = (req,res,next) =>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
-    const obj = new Product(title,price,description,imageUrl);
+    // console.log(req.user[0]._id)
+    const obj = new Product(title,price,description,imageUrl,req.user[0]._id);
     obj.save().then(response =>{
         console.log(response)
         res.status(200).send('product added successfully')

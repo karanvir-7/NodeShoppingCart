@@ -3,12 +3,13 @@ var ObjectId = require('mongodb').ObjectID;
 
 class Product  {
 
-   constructor(title, price, description, imageUrl){
+   constructor(title, price, description, imageUrl,userId){
         this.title = title;
         this.price = price;
         this.description = description;
-        this.imageUrl = imageUrl
-   }
+        this.imageUrl = imageUrl;
+        this.userId = userId
+      }
 
    save(){
      const db = getDb();
