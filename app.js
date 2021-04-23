@@ -13,8 +13,8 @@ app.use(express.json())
 
 app.use((req,res,next)=>{
     User.findById('6081bbd7fcd24696760f03b8').then(user =>{
-        req.user = user;
-        console.log(user)
+        req.body.user = user;
+        // console.log(user)
         next();
     })
 })

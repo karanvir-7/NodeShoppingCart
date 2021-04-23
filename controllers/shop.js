@@ -1,4 +1,6 @@
+const e = require('express');
 const Product  = require('../models/products.js');
+const User = require('../models/user');
 
 exports.getAllProducts = (req,res,next) => {
   Product.findAll().then(resp=>{
@@ -28,38 +30,45 @@ exports.getCart= (req,res,next) =>{
 }
 
 exports.addItem = (req,res,next) => {
-    const prodId = req.body.productId;
-    let fetchedCart;
-    let newQuantity = 1;
-    req.user
-      .getCart()
-      .then(cart => {
-        fetchedCart = cart;
-        return cart.getProducts({ where: { id: prodId } });
-      })
-      .then(products => {
-        let product;
-        console.log(products)
-        if (products.length > 0) {
-          product = products[0];
+    const product = req.body
+    const userId = req.body.user[0]._id
+    if(!req.body.user[0]._id){
+      return res.status(400).send('Product Id is required');
+    }
+    // console.log(product)
+    User.checkExistingProduct(userId).then(response =>{
+
+       var body  = req.body;
+       delete body.user;
+       var cartItems = response[0].cart.items
+       const index  = cartItems.findIndex(item =>{
+           return item.productId == product._id
+       })
+       var updatedCart;
+       updatedCart = response[0]['cart']
+       if(index >= 0){
+           console.log(updatedCart,index)
+           updatedCart['items'][index].quantity = response[0].cart['items'][index].quantity + 1;
+        } else{
+            updatedCart['items'].push({productId:product._id,quantity:1})
         }
+  
+          var newvalues = {
+            $set: {
+                username : response[0].name,
+                email : response[0].email,
+                cart: updatedCart
+            } 
+          }
     
-        if (product) {
-          const oldQuantity = product.cartItem.quantity;
-          newQuantity = oldQuantity + 1;
-          return product;
-        }
-        return Product.findByPk(prodId);
-      })
-      .then(product => {
-        return fetchedCart.addProduct(product, {
-          through: { quantity: newQuantity }
-        });
-      })
-      .then(() => {
-        res.status(200).send('Cart Updated Succesfully')
-      })
-      .catch(err => console.log(err));
+        User.updateCart(userId,newvalues).then(cart =>{
+          res.status(200).send(cart)
+        }).catch(err =>{
+          res.status(200).send(err)
+        })
+      
+    });
+  
     
 }
 
