@@ -18,6 +18,11 @@ class User {
      const db = getDb();
      return db.collection('users').find({_id: ObjectId(id)}).toArray()
   }
+  
+  static getCartProducts(productIds){
+    const db = getDb();
+    return db.collection('products').find({_id: { $in: productIds }}).toArray();
+  }
 
   static updateCart(id,newValues){
     const db = getDb();
