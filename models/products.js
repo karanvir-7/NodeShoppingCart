@@ -21,6 +21,9 @@ class Product  {
     return db.collection('products').deleteOne({ _id: ObjectId(id)})
    }
 
+
+
+
    static updateProductDetails(id,newValues){
     const db = getDb();
     return db.collection('products').updateOne({ _id: ObjectId(id)},newValues)

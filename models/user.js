@@ -13,7 +13,12 @@ class User {
      const db = getDb();
      return db.collection('users').insertOne(this);
   }
-  
+
+  static orderItem(order){
+    const db = getDb();
+    return  db.collection('orders').insertOne(order)
+  }
+
   static checkExistingProduct(id){
      const db = getDb();
      return db.collection('users').find({_id: ObjectId(id)}).toArray()
