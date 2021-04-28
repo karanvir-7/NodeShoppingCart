@@ -1,44 +1,65 @@
-const getDb = require('../utils/database').getDb;
-var ObjectId = require('mongodb').ObjectID;
+const mongoose  = require('mongoose');
 
-class Product  {
+const Schema  = mongoose.Schema;
 
-   constructor(title, price, description, imageUrl,userId){
-        this.title = title;
-        this.price = price;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.userId = userId
-      }
+const productSchema = new Schema({
+  title:{
+    type: String,
+    required:true
+  },
+  price:{
+    type: Number,
+    required:true
+  },
+  description:{
+    type: String,
+    required:true
+  },
+  imageUrl:{
+    type: String,
+    required:true
+  }
+})
 
-   save(){
-     const db = getDb();
-     return db.collection('products').insertOne(this)
-   }
+module.exports = mongoose.model('Product',productSchema);
+// const getDb = require('../utils/database').getDb;
+// var ObjectId = require('mongodb').ObjectID;
 
-   static deleteById(id){
-    const db = getDb();
-    return db.collection('products').deleteOne({ _id: ObjectId(id)})
-   }
+// class Product  {
 
+//    constructor(title, price, description, imageUrl,userId){
+//         this.title = title;
+//         this.price = price;
+//         this.description = description;
+//         this.imageUrl = imageUrl;
+//         this.userId = userId
+//       }
 
+//    save(){
+//      const db = getDb();
+//      return db.collection('products').insertOne(this)
+//    }
 
+//    static deleteById(id){
+//     const db = getDb();
+//     return db.collection('products').deleteOne({ _id: ObjectId(id)})
+//    }
 
-   static updateProductDetails(id,newValues){
-    const db = getDb();
-    return db.collection('products').updateOne({ _id: ObjectId(id)},newValues)
-   }
+//    static updateProductDetails(id,newValues){
+//     const db = getDb();
+//     return db.collection('products').updateOne({ _id: ObjectId(id)},newValues)
+//    }
 
-   static getAllProducts(){
-     const db = getDb();
-     return db.collection('products').find().toArray()
-   }
+//    static getAllProducts(){
+//      const db = getDb();
+//      return db.collection('products').find().toArray()
+//    }
 
-   static getProductById(id){
-     const db = getDb();
-     return  db.collection('products').find({ _id: ObjectId(id) }).toArray();
-   }
+//    static getProductById(id){
+//      const db = getDb();
+//      return  db.collection('products').find({ _id: ObjectId(id) }).toArray();
+//    }
 
-}
+// }
 
-module.exports = Product;
+// module.exports = Product;

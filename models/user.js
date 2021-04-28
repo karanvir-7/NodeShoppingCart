@@ -1,44 +1,66 @@
-const getDb = require('../utils/database').getDb;
-var ObjectId = require('mongodb').ObjectID;
+const mongoose  = require('mongoose');
 
-class User {
+const Schema  = mongoose.Schema;
 
-  constructor(username,email,cart){
-    this.username = username;
-    this.email =email;
-    this.cart = cart;
+const userSchema = new Schema({
+  name:{
+    type: String,
+    required:true
+  },
+  email:{
+    type: String,
+    required:true
+  },
+  cart:{
+    items:[{productId:{},quantity:{}}]
   }
+})
 
-  save(){
-     const db = getDb();
-     return db.collection('users').insertOne(this);
-  }
+module.exports = mongoose.model('user',userSchema);
 
-  static orderItem(order){
-    const db = getDb();
-    return  db.collection('orders').insertOne(order)
-  }
 
-  static checkExistingProduct(id){
-     const db = getDb();
-     return db.collection('users').find({_id: ObjectId(id)}).toArray()
-  }
+
+// const getDb = require('../utils/database').getDb;
+// var ObjectId = require('mongodb').ObjectID;
+
+// class User {
+
+//   constructor(username,email,cart){
+//     this.username = username;
+//     this.email =email;
+//     this.cart = cart;
+//   }
+
+//   save(){
+//      const db = getDb();
+//      return db.collection('users').insertOne(this);
+//   }
+
+//   static orderItem(order){
+//     const db = getDb();
+//     return  db.collection('orders').insertOne(order)
+//   }
+
+//   static checkExistingProduct(id){
+//      const db = getDb();
+//      return db.collection('users').find({_id: ObjectId(id)}).toArray()
+//   }
   
-  static getCartProducts(productIds){
-    const db = getDb();
-    return db.collection('products').find({_id: { $in: productIds }}).toArray();
-  }
+//   static getCartProducts(productIds){
+//     const db = getDb();
+//     return db.collection('products').find({_id: { $in: productIds }}).toArray();
+//   }
 
-  static updateCart(id,newValues){
-    const db = getDb();
-    return db.collection('users').updateOne({ _id: ObjectId(id)},newValues)
-   }
+//   static updateCart(id,newValues){
+//     const db = getDb();
+//     return db.collection('users').updateOne({ _id: ObjectId(id)},newValues)
+//    }
 
-  static findById(id){
-    const db = getDb();
-    return db.collection('users').find({ _id: ObjectId(id) }).toArray();
-  }
+//   static findById(id){
+//     const db = getDb();
+//     return db.collection('users').find({ _id: ObjectId(id) }).toArray();
+//   }
 
-}
+// }
 
-module.exports = User;
+// module.exports = User;

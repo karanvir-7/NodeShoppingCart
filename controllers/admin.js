@@ -1,7 +1,7 @@
 const Product  = require('../models/products.js');
 
 exports.getAllProducts = (req,res,next) => {
-    Product.getAllProducts().then(response =>{
+    Product.find().then(response =>{
         res.status(200).send(response)
     })
     .catch(err =>{
@@ -11,7 +11,7 @@ exports.getAllProducts = (req,res,next) => {
 
 exports.getAllProductsById = (req,res,next) => {
     const id = req.query.id;
-    Product.getProductById(id).then(data =>{
+    Product.findById(id).then(data =>{
         res.status(200).send(data)
      }).catch(err =>{
         res.status(200).send(err);
@@ -24,7 +24,12 @@ exports.addProduct = (req,res,next) =>{
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
     // console.log(req.user[0]._id)
-    const obj = new Product(title,price,description,imageUrl,req.user[0]._id);
+    const obj = new Product({
+        title:title,
+        price:price,
+        description:description,
+        imageUrl:imageUrl
+    });
     obj.save().then(response =>{
         console.log(response)
         res.status(200).send('product added successfully')
@@ -35,21 +40,23 @@ exports.addProduct = (req,res,next) =>{
 
 exports.editProduct = (req,res,next)=>{
 
-    var newvalues = {
-        $set: {
-            title : req.body.title,
-            price : req.body.price,
-            description : req.body.description,
-            imageUrl : req.body.imageUrl
-        } 
+    const productId = req.body._id;
+    
+    if(!productId){
+     return res.status(400).send('Product Id is Required')
     }
 
-    const productId = req.body.id;
-    Product.updateProductDetails(productId,newvalues).then(resp=>{
-        res.status(200).send('Product Updated Successfully');
-    }).catch(err=>{
-        res.status(400).send(err);
-    });
+    Product.findById(productId).then(product =>{
+        product.title = req.body.title,
+        product.price = req.body.price,
+        product.description = req.body.description,
+        product.imagUrl = req.body.imageUrl
+        return product.save()
+    }).then(result =>{
+        res.status(200).send('Product Update Successfully')
+    }).catch(err =>{
+        res.status(400).send(err)
+    })
 }
 
 exports.deleteProduct = (req,res,next) =>{
@@ -59,7 +66,7 @@ exports.deleteProduct = (req,res,next) =>{
     if(!productId){
         return res.status(400).send('Please provide Product Id')
     }
-    Product.deleteById(productId).then(resp=>{
+    Product.findByIdAndDelete(productId).then(resp=>{
         res.status(200).send('Product Deleted Successfully');
     }).catch(err=>{
         res.status(400).send(err);
