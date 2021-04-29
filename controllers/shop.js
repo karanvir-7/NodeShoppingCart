@@ -1,4 +1,4 @@
-const e = require('express');
+
 const Product  = require('../models/products.js');
 const User = require('../models/user');
 var ObjectId = require('mongodb').ObjectID;
@@ -22,112 +22,144 @@ exports.getAllProductsById = (req,res,next) => {
 
 exports.getCart= (req,res,next) =>{
      
-    const userId = req.body.user[0]._id;
-
-    if(!req.body.user[0]._id){
-      return res.status(400).send('User Id is required');
+    const products = req.body.user.getCartItem()
+    
+    let  productIds = [];
+    for(let p of products){
+        productIds.push(ObjectId(p.productId))
     }
+  
+    Product.find({ '_id': { $in: productIds } }).lean().then(prods =>{
+      let productItems = prods
+      products.forEach(p =>{
+        productItems.forEach(pro =>{
+          if(p.productId.toString() == pro._id.toString()){
+            pro['quantity'] = p['quantity'];
+          }
+        })
+      });
 
-    User.checkExistingProduct(userId).then(response =>{
-
-      if(!response[0].cart.items){
-        return res.status(200).send('Cart is Empty')
-      }
-
-      let productIds = [];
-      var items = response[0].cart.items;
-      for(let product of response[0].cart.items){
-        productIds.push(ObjectId(product.productId))
-      }
-
-      User.getCartProducts(productIds).then(products =>{
-        products.forEach(product => {
-          items.forEach(prod =>{
-             if(prod.productId == product._id){
-               product.quantity = prod.quantity
-             }
-          });
-        });
-       return res.status(200).send(products);
-      })
-      
+      return res.status(200).send(productItems);
     }).catch(err =>{
         res.status(200).send(err)
-    })
+    });
+    // User.getCartProducts(productIds).then(products =>{
+    //     products.forEach(product => {
+    //       items.forEach(prod =>{
+    //          if(prod.productId == product._id){
+    //            product.quantity = prod.quantity
+    //          }
+    //       });
+    //     });
+    //    return res.status(200).send(products);
+    //   })
+      
+    // }).catch(err =>{
+    //     res.status(200).send(err)
+    // })
+    // User.checkExistingProduct(userId).then(response =>{
+
+    //   if(!response[0].cart.items){
+    //     return res.status(200).send('Cart is Empty')
+    //   }
+
+    //   let productIds = [];
+    //   var items = response[0].cart.items;
+    //   for(let product of response[0].cart.items){
+    //     productIds.push(ObjectId(product.productId))
+    //   }
+
+    //   User.getCartProducts(productIds).then(products =>{
+    //     products.forEach(product => {
+    //       items.forEach(prod =>{
+    //          if(prod.productId == product._id){
+    //            product.quantity = prod.quantity
+    //          }
+    //       });
+    //     });
+    //    return res.status(200).send(products);
+    //   })
+      
+    // }).catch(err =>{
+    //     res.status(200).send(err)
+    // })
 
 }
 
 exports.addItem = (req,res,next) => {
-    const product = req.body
-    const userId = req.body.user[0]._id;
-
-    if(!req.body.user[0]._id){
+  console.log(req.body._id)
+    const productId = req.body._id
+    if(!req.body._id){
       return res.status(400).send('User Id is required');
     }
-    // console.log(product)
-    User.checkExistingProduct(userId).then(response =>{
+   // console.log(productId)
+    Product.findById(productId).then(product =>{
+      return req.body.user.addToCart(product)
+    }).then(response =>{
+        res.status(200).send(response)
+     }).catch(err =>{
+    res.status(400).send(err);
+    })
+    // User.checkExistingProduct(userId).then(response =>{
 
-       var body  = req.body;
-       delete body.user;
-       var cartItems
-       var updatedCart = {};
-       if(response[0]['cart'].items){
-        cartItems = response[0].cart.items
-        const index  = cartItems.findIndex(item =>{
-            return item.productId == product._id
-        })
-        updatedCart = response[0]['cart']
-        if(index >= 0){
-            updatedCart['items'][index].quantity = response[0].cart['items'][index].quantity + 1;
-          } else{
-             updatedCart['items'].push({productId:product._id,quantity:1})
-         }
-       }
-       else{
-          updatedCart['items'] = [];
-          updatedCart['items'].push({productId:product._id,quantity:1});
-       }
+    //    var body  = req.body;
+    //    delete body.user;
+    //    var cartItems
+    //    var updatedCart = {};
+    //    if(response[0]['cart'].items){
+    //     cartItems = response[0].cart.items
+    //     const index  = cartItems.findIndex(item =>{
+    //         return item.productId == product._id
+    //     })
+    //     updatedCart = response[0]['cart']
+    //     if(index >= 0){
+    //         updatedCart['items'][index].quantity = response[0].cart['items'][index].quantity + 1;
+    //       } else{
+    //          updatedCart['items'].push({productId:product._id,quantity:1})
+    //      }
+    //    }
+    //    else{
+    //       updatedCart['items'] = [];
+    //       updatedCart['items'].push({productId:product._id,quantity:1});
+    //    }
 
-       var newvalues = {
-            $set: {
-                username : response[0].name,
-                email : response[0].email,
-                cart: updatedCart
-            } 
-        }
+    //    var newvalues = {
+    //         $set: {
+    //             username : response[0].name,
+    //             email : response[0].email,
+    //             cart: updatedCart
+    //         } 
+    //     }
 
-        User.updateCart(userId,newvalues).then(cart =>{
-          res.status(200).send(cart)
-        }).catch(err =>{
-          res.status(200).send(err)
-        })
+    //     User.updateCart(userId,newvalues).then(cart =>{
+    //       res.status(200).send(cart)
+    //     }).catch(err =>{
+    //       res.status(200).send(err)
+    //     })
       
-    });
+    // });
   
     
 }
 
 
 exports.deleteProductFromCart = (req,res,next) =>{
-
-  const userId = req.body.user[0]._id;
+  
+  const userId = req.body.user._id;
   const productRemoveId = req.body.productId;
 
-  if(!req.body.user[0]._id){
+  if(!req.body.user._id){
     return res.status(400).send('User Id is required');
   }
 
-  User.checkExistingProduct(userId).then(response =>{
+  User.findById(userId).then(response =>{
     var cartItems ;
-    cartItems = response[0].cart.items
+    cartItems = response.cart.items
     var updatedCart = {};
-
     const index  = cartItems.findIndex(item =>{
         return item.productId == productRemoveId
     });
-
-    updatedCart = response[0]['cart']
-    
+    updatedCart = response['cart']
     if(index >= 0){
       updatedCart['items'].splice(index,1);
      } else{
@@ -135,12 +167,10 @@ exports.deleteProductFromCart = (req,res,next) =>{
     }
 
     var newvalues = {
-      $set: {
           cart: updatedCart
-      } 
     }
 
-    User.updateCart(userId,newvalues).then(cart =>{
+    User.findByIdAndUpdate(userId,newvalues).then(cart =>{
       res.status(200).send(cart)
     }).catch(err =>{
       res.status(200).send(err)
@@ -154,6 +184,7 @@ exports.deleteProductFromCart = (req,res,next) =>{
 
 exports.postOrder  = (req,res,next) =>{
   
+ 
   const userId = req.body.user[0]._id;
 
   if(!userId){

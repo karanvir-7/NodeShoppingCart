@@ -14,7 +14,7 @@ app.use(express.json())
 app.use((req,res,next)=>{
    User.findById('6083c5a92cb5a74c998147ad').then(user =>{
        req.body.user = user;
-        console.log(user)
+        // console.log(user)
        next();
    })
 })
