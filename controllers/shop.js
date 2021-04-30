@@ -1,6 +1,8 @@
 
 const Product  = require('../models/products.js');
 const User = require('../models/user');
+const Order = require('../models/order');
+
 var ObjectId = require('mongodb').ObjectID;
 
 exports.getAllProducts = (req,res,next) => {
@@ -153,8 +155,9 @@ exports.deleteProductFromCart = (req,res,next) =>{
   }
 
   User.findById(userId).then(response =>{
+    
     var cartItems ;
-    cartItems = response.cart.items
+    cartItems = response.cart.items;
     var updatedCart = {};
     const index  = cartItems.findIndex(item =>{
         return item.productId == productRemoveId
@@ -184,52 +187,64 @@ exports.deleteProductFromCart = (req,res,next) =>{
 
 exports.postOrder  = (req,res,next) =>{
   
- 
-  const userId = req.body.user[0]._id;
+  // console.log(req.body)
+  const userId = req.body.user._id;
 
   if(!userId){
     return res.status(400).send('User Id is required');
   }  
-  
-  User.checkExistingProduct(userId).then(response =>{
-    let user = response[0];
-   // console.log(user['cart']['items'])
 
-    if(user['cart']['items'].length == 0){
-      return res.status(200).send('No Product in Cart')
-    }
+  let userCart = req.body.user.cart.items;
 
-    let orderItems = user['cart']['items'];
-    let productIds = [];
-    for(let product of response[0].cart.items){
-      productIds.push(ObjectId(product.productId))
-    }
+  if(userCart.length == 0){
+    return res.status(200).send('No Product in Cart')
+  }
+
+  let  productIds = [];
+  for(let item of userCart){
+      productIds.push(ObjectId(item.productId))
+  }
+
+  Product.find({ '_id': { $in: productIds } }).lean().then(prods =>{
+    let productItems = prods
+    console.log(prods)
+    userCart.forEach(p =>{
+      productItems.forEach(pro =>{
+        if(p.productId.toString() == pro._id.toString()){
+          pro['quantity'] = p['quantity'];
+          pro.userDetails = req.body;
+        }
+      });
+    });
     
-    User.getCartProducts(productIds).then(products =>{
+    let updatedCart = {};
+    updatedCart['items'] = [];
 
-      products.forEach(product => {
-        orderItems.forEach(prod =>{
-           if(prod.productId == product._id){
-             product.quantity = prod.quantity;
-             product.userDetails = user;
-           }
-         });
+    var newvalues = {
+          cart: updatedCart
+    }
+    User.findByIdAndUpdate(userId,newvalues).then(cart =>{
+      var orderData = [];
+      productItems.forEach(item =>{
+      const obj  = {
+        productId : item._id,
+        price: item.price,
+        userDetails: item.userDetails,
+        productName: item.title,
+        quantity:item.quantity,
+        status:'ordered'
+      }
+      orderData.push(obj);
       });
-      console.log(products)
-      User.orderItem(products[0]).then(prod =>{
-          let updatedCart = {};
-          updatedCart['items'] = [];
-          var newvalues = {
-             $set: {
-              cart: updatedCart
-            } 
-          }
-        User.updateCart(userId,newvalues).then(cart =>{
-            return res.status(200).send(products);
-           });
-        });
-      });
+      Order.insertMany(orderData).then(ordereddata=>{
+        res.status(200).send(ordereddata)
+      }).catch(err =>{
+        res.status(400).send(err)
+      })
+  
     }).catch(err =>{
-    console.log(err);
-  })
+      res.status(200).send(err)
+    })
+  });
+
 }
