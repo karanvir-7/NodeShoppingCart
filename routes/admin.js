@@ -13,4 +13,10 @@ router.put('/editProduct',adminController.editProduct);
 
 router.delete('/deleteProduct',adminController.deleteProduct)
 
+router.get('/getOrders',adminController.getOrders);
+
+router.get('/getOrderById',adminController.getOrderById);
+
+router.put('/changeStatusOrder',adminController.changeStatus);
+
 module.exports = router;
