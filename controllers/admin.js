@@ -2,21 +2,26 @@ const Product  = require('../models/products.js');
 const Order = require('../models/order');
 
 exports.getAllProducts = (req,res,next) => {
+
     Product.find().then(response =>{
         res.status(200).send(response)
     })
     .catch(err =>{
         res.status(200).send(err);
     });
+
 }
 
 exports.getAllProductsById = (req,res,next) => {
+
     const id = req.query.id;
+    
     Product.findById(id).then(data =>{
         res.status(200).send(data)
      }).catch(err =>{
         res.status(200).send(err);
     });
+
 }
 
 exports.addProduct = (req,res,next) =>{
@@ -25,7 +30,6 @@ exports.addProduct = (req,res,next) =>{
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
-    // console.log(req.user[0]._id)
 
     const obj = new Product({
         title:title,
@@ -35,7 +39,6 @@ exports.addProduct = (req,res,next) =>{
     });
 
     obj.save().then(response =>{
-        console.log(response)
         res.status(200).send('product added successfully')
     }).catch(err =>{
         res.status(400).send(err);
@@ -57,7 +60,7 @@ exports.editProduct = (req,res,next)=>{
         product.imagUrl = req.body.imageUrl
         return product.save()
     }).then(result =>{
-        res.status(200).send('Product Update Successfully')
+        res.status(200).send({message:'Product Update Successfully',product:result})
     }).catch(err =>{
         res.status(400).send(err)
     });

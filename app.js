@@ -19,6 +19,9 @@ app.use((req,res,next)=>{
    })
 })
 
+app.use('/admin',adminRoutes);
+app.use('/user',userRoutes);
+
 dbConnect()
 .then(client =>{
     app.listen(port, () => { console.log(`app listening at http://localhost:${port}`)})
@@ -26,14 +29,3 @@ dbConnect()
 .catch(err =>{
         console.log(err);
 });
-
-app.use('/admin',adminRoutes);
-app.use('/user',userRoutes)
-
-
-
-// mongoConnect(()=>{
-//     app.listen(port, () => {
-//         console.log(`app listening at http://localhost:${port}`)
-//     })
-// })

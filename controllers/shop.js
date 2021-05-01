@@ -106,7 +106,6 @@ exports.deleteProductFromCart = (req,res,next) =>{
 
 exports.postOrder  = (req,res,next) =>{
   
-  // console.log(req.body)
   const userId = req.body.user._id;
 
   if(!userId){
