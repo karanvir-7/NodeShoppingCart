@@ -1,19 +1,29 @@
 const mongoose  = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const Schema  = mongoose.Schema;
-
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
   name:{
     type: String,
     required:true
   },
   email:{
     type: String,
+    unique:true,
+    required:true
+  },
+  password:{
+    type: String,
     required:true
   },
   cart:{
     items:[{productId:{},quantity:{}}]
-  }
+  },
+  tokens:[{
+    token:{
+      type:String,
+      required:true
+    }
+  }]
 })
 
 userSchema.methods.addToCart = function(product){
@@ -47,6 +57,26 @@ userSchema.methods.getCartItem = function(){
 
     return this.cart['items'];
 }
+
+
+userSchema.statics.findByCredentials = async(email, password) =>{
+
+      const user = await User.findOne({email:email});
+
+      if(!user){
+          throw new Error('Unable to log In')
+      }
+
+      const isMatch = await bcrypt.compare(password,user.password)
+
+      if(!isMatch){
+        throw new Error('credentials are wrong');
+      }
+       
+      return user;      
+}
+
+const User = mongoose.model('user',userSchema);
 
 module.exports = mongoose.model('user',userSchema);
 
