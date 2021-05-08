@@ -10,9 +10,9 @@ const auth = async (req,res,next) =>{
           throw new Error('Please Provide Token for authentication')
       }
      
-      const verify = jwt.verify(token,'shoppingCart')
+      const decode = jwt.verify(token,'shoppingCart')
 
-      const user = await User.findOne({'_id':verify._id,'tokens.token': token})
+      const user = await User.findOne({'_id':decode._id,'tokens.token': token})
       console.log(user)
 
       if(!user){

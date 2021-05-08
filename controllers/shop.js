@@ -3,7 +3,7 @@ const User = require('../models/user');
 const Order = require('../models/order');
 const bcrypt = require('bcryptjs');
 var ObjectId = require('mongodb').ObjectID;
-
+const jwt = require('jsonwebtoken');
 
 exports.signUp = async(req,res,next)=>{
   console.log(req.body)
@@ -32,13 +32,14 @@ exports.logIn = async (req,res,next) =>{
   //console.log(req.body)
  
  try{
+   console.log(req.body)
     const user = await User.findByCredentials(req.body.email,req.body.password)
-    
+    console.log(user)
     var token = await jwt.sign({ _id: user._id.toString() }, 'shoppingCart');
-    
+    console.log(token)
     user.tokens = user.tokens.push({token:token});
     
-  //   console.log(user)
+    console.log(user)
 
     const u = new User(user)
     await u.save();

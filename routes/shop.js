@@ -3,7 +3,7 @@ const router = express.Router();
 const auth  = require('../middleware/auth');
 const shopController = require('../controllers/shop')
 
-router.post('/signUp',auth,shopController.signUp);
+router.post('/signUp',shopController.signUp);
 
 router.post('/logIn',shopController.logIn);
 
