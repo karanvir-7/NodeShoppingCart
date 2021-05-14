@@ -7,6 +7,10 @@ router.post('/signUp',shopController.signUp);
 
 router.post('/logIn',shopController.logIn);
 
+router.post('/logOut',auth,shopController.logOut);
+
+router.post('/logOutAll',auth,shopController.logOutAll);
+
 router.get('/getCartItems',auth,shopController.getCart);
 
 router.post('/addItemInCart',auth,shopController.addItem)

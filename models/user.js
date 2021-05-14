@@ -58,6 +58,15 @@ userSchema.methods.getCartItem = function(){
     return this.cart['items'];
 }
 
+userSchema.methods.toJSON = function(){
+   
+    let user = this;
+    let userData = user.toObject();
+    delete userData.password;
+    delete userData.tokens;
+
+    return userData;
+}
 
 userSchema.statics.findByCredentials = async(email, password) =>{
 

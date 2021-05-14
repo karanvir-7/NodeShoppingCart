@@ -50,6 +50,35 @@ exports.logIn = async (req,res,next) =>{
  }
 }
 
+exports.logOut = async (req,res) =>{
+    try{
+      console.log(req.body.user.tokens)
+        req.body.user.tokens = req.body.user.tokens.filter(token =>{
+          // console.log(token.token,req.body.token)
+          return token.token != req.body.token
+        });
+        // console.log(req.body.user)
+        const user  = new User(req.body.user);
+        await user.save();
+
+        res.status(200).send('Logged Out Successfully');
+    }catch(error){
+      res.status(500).send({error:error,message:'Unable to Log Out'})
+    }
+}
+
+exports.logOutAll = async (req,res) =>{
+  try{
+      req.body.user.tokens = [];
+      const user  = new User(req.body.user);
+      await user.save();
+
+      res.status(200).send('Logged Out from all Devices Successfully');
+  }catch(error){
+    res.status(500).send({error:error,message:'Unable to Log Out'})
+  }
+}
+
 exports.getAllProducts = (req,res,next) => {
     
     Product.find().then(resp=>{
