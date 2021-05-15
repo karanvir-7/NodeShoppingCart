@@ -43,7 +43,7 @@ exports.logIn = async (req,res,next) =>{
     await u.save();
 
     transporter.sendMail({
-     to:  'taranvirvirdi@gmail.com',
+     to:  req.body.email,
      from: 'karanvirvirdi185@gmail.com',
      subject:' logged in',
      html: '<h1>helo </h1>' 
