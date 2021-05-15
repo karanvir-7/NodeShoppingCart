@@ -4,9 +4,9 @@ const Order = require('../models/order');
 const bcrypt = require('bcryptjs');
 var ObjectId = require('mongodb').ObjectID;
 const jwt = require('jsonwebtoken');
+const transporter = require('../utils/mail');
 
 exports.signUp = async(req,res,next)=>{
-  console.log(req.body)
 
   const encryptedPassword = await bcrypt.hash(req.body.password,8)
 
@@ -32,17 +32,22 @@ exports.logIn = async (req,res,next) =>{
   //console.log(req.body)
  
  try{
-   console.log(req.body)
+  
     const user = await User.findByCredentials(req.body.email,req.body.password)
-    console.log(user)
+  
     var token = await jwt.sign({ _id: user._id.toString() }, 'shoppingCart');
-    console.log(token)
+  
     user.tokens = user.tokens.push({token:token});
-    
-    console.log(user)
 
     const u = new User(user)
     await u.save();
+
+    transporter.sendMail({
+     to:  req.body.email,
+     from: 'karanvirvirdi185@gmail.com',
+     subject:' logged in',
+     html: '<h1>helo </h1>' 
+    });
 
     res.status(200).send({user,token});
  }catch(e){
@@ -52,7 +57,7 @@ exports.logIn = async (req,res,next) =>{
 
 exports.logOut = async (req,res) =>{
     try{
-      console.log(req.body.user.tokens)
+
         req.body.user.tokens = req.body.user.tokens.filter(token =>{
           // console.log(token.token,req.body.token)
           return token.token != req.body.token
