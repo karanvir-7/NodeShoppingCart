@@ -84,6 +84,24 @@ exports.logOutAll = async (req,res) =>{
   }
 }
 
+exports.forgotPassword = async(req,res,next) =>{
+  
+  let user = await User.findOne({email: req.body.email})
+
+  if(!user){
+    return res.status(400).send({error:"email doesn't found"})
+  }
+
+  var token = await jwt.sign({ _id: 'requestToken' }, 'shoppingCart', { expiresIn: '1h' });
+   
+  user.resetToken = token;
+  user.resetTokenExpiration = Date.now() + 3600000;
+
+  await user.save();
+  
+  res.status(200).send(user)
+}
+
 exports.getAllProducts = (req,res,next) => {
     
     Product.find().then(resp=>{
