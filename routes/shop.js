@@ -9,6 +9,8 @@ router.post('/logIn',shopController.logIn);
 
 router.post('/forgotPassword',shopController.forgotPassword);
 
+router.post('/resetPassword',shopController.resetPassword);
+
 router.post('/logOut',auth,shopController.logOut);
 
 router.post('/logOutAll',auth,shopController.logOutAll);

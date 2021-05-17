@@ -42,13 +42,6 @@ exports.logIn = async (req,res,next) =>{
     const u = new User(user)
     await u.save();
 
-    transporter.sendMail({
-     to:  req.body.email,
-     from: 'karanvirvirdi185@gmail.com',
-     subject:' logged in',
-     html: '<h1>helo </h1>' 
-    });
-
     res.status(200).send({user,token});
  }catch(e){
     res.status(400).send(e);
@@ -99,7 +92,37 @@ exports.forgotPassword = async(req,res,next) =>{
 
   await user.save();
   
+  transporter.sendMail({
+    to:  req.body.email,
+    from: 'karanvirvirdi185@gmail.com',
+    subject:'Reset Password',
+    html: `
+     <p>You requested password to reset</p>
+     <p>Click this link to set a new Password</p>
+     <button ><a href="http://localhost:3000/user/resetPassword?${token}">reset</a></button>
+     ` 
+   });
+
   res.status(200).send(user)
+}
+
+exports.resetPassword = async(req,res,next) =>{
+  
+  const token = req.body.token;
+
+  if(req.body.newPassword != req.body.confirmPassword){
+    return res.status(400).send({err:"Password Does not Match"})
+  }
+
+  const user = await User.findOne({resetToken:token,resetTokenExpiration: {$gt: Date.now()}});
+
+  const encryptedPassword = await bcrypt.hash(req.body.newPassword,8);
+
+  user.password = encryptedPassword;
+
+  await user.save();
+
+  res.status(200).send({Message:"Password changed Successfully"});
 }
 
 exports.getAllProducts = (req,res,next) => {
