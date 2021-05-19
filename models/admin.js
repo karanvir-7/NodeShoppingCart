@@ -1,19 +1,26 @@
 const mongoose  = require('mongoose');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const adminSchema = new mongoose.Schema({
   name:{
     type: String,
-    required:true
+    required:true,
+    trim:true
   },
   email:{
     type: String,
     unique:true,
-    required:true
+    required:true,
+    validate(val){
+      if(!validator.isEmail(val)){
+        throw new Error('Email is invalid')
+      }
+    }
   },
   password:{
     type: String,
-    required:true
+    required:true,
   },
   tokens:[{
     token:{

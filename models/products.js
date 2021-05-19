@@ -9,7 +9,12 @@ const productSchema = new Schema({
   },
   price:{
     type: Number,
-    required:true
+    required:true,
+    validate(value){
+      if(value < 0){
+        throw new Error('Price cannot be negative')
+      }
+    }
   },
   description:{
     type: String,

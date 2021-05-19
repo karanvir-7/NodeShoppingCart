@@ -13,7 +13,12 @@ const orderSchema = new Schema({
   },
   price:{
     type: Number,
-    required:true
+    required:true,
+    validate(value){
+      if(value < 0){
+        throw new Error('Price cannot be negative')
+      }
+    }
   },
   userDetails:{
     type: Object,
@@ -25,7 +30,12 @@ const orderSchema = new Schema({
   },
   quantity:{
     type:Number,
-    required:true
+    required:true,
+    validate(value){
+      if(value < 0){
+        throw new Error('quantity cannot be negative')
+      }
+    }
   }
 })
 
