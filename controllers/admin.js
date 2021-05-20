@@ -82,8 +82,9 @@ exports.signUp = async(req,res,next)=>{
 
 
 exports.getAllProducts = (req,res,next) => {
-
-    Product.find().then(response =>{
+    console.log(req.query)
+    var body  = req.query.price ? {'price':req.query.price } : {}
+    Product.find(body).then(response =>{
         res.status(200).send(response)
     })
     .catch(err =>{

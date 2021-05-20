@@ -6,7 +6,7 @@ const adminSchema = new mongoose.Schema({
   name:{
     type: String,
     required:true,
-    trim:true
+    trim:true,
   },
   email:{
     type: String,
@@ -28,6 +28,8 @@ const adminSchema = new mongoose.Schema({
       required:true
     }
   }]
+},{
+  timestamps:true
 });
 
 adminSchema.statics.findByCredentials = async(email, password) =>{
