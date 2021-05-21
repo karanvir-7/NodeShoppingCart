@@ -82,9 +82,12 @@ exports.signUp = async(req,res,next)=>{
 
 
 exports.getAllProducts = (req,res,next) => {
-    console.log(req.query)
+
     var body  = req.query.price ? {'price':req.query.price } : {}
-    Product.find(body).then(response =>{
+    let limit = req.query.limit ? parseInt(req.query.limit) : 5;
+    let page =  req.query.page ? parseInt(req.query.page) : 1;
+
+    Product.find(body).limit(limit).skip((page-1)*limit).sort({price:"asc"}).then(response =>{
         res.status(200).send(response)
     })
     .catch(err =>{
