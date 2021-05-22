@@ -81,18 +81,24 @@ exports.signUp = async(req,res,next)=>{
   }
 
 
-exports.getAllProducts = (req,res,next) => {
+exports.getAllProducts = async(req,res,next) => {
 
-    var body  = req.query.price ? {'price':req.query.price } : {}
     let limit = req.query.limit ? parseInt(req.query.limit) : 5;
     let page =  req.query.page ? parseInt(req.query.page) : 1;
+    var searchString = req.query.search ? req.query.search : '';
 
-    Product.find(body).limit(limit).skip((page-1)*limit).sort({price:"asc"}).then(response =>{
-        res.status(200).send(response)
-    })
-    .catch(err =>{
-        res.status(200).send(err);
-    });
+    let condition = { $or:[
+        { title:  { $regex: searchString, $options: "i" } },
+        { description: { $regex: searchString, $options: "i" } }
+    ]};
+    
+    try{
+        let products = await Product.find(condition).limit(limit).skip((page-1)*limit).sort({price:"asc"});
+        res.status(200).send(products)
+    }catch(e){
+        res.status(400).send(e);
+    }
+    
 }
 
 exports.getAllProductsById = (req,res,next) => {
