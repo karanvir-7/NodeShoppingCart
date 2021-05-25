@@ -31,10 +31,10 @@ exports.signUp = async(req,res,next)=>{
 exports.logIn = async (req,res,next) =>{
   //console.log(req.body)
  
- try{
-  
+ try{ 
+    console.log(req.body)
     const user = await User.findByCredentials(req.body.email,req.body.password)
-  
+    console.log(user)
     var token = await jwt.sign({ _id: user._id.toString() }, 'shoppingCart');
   
     user.tokens = user.tokens.push({token:token});
@@ -170,7 +170,7 @@ exports.getCart= (req,res,next) =>{
 }
 
 exports.addItem = (req,res,next) => {
-  console.log(req.body._id)
+  console.log(req.body)
     const productId = req.body._id
     if(!req.body._id){
       return res.status(400).send('User Id is required');
@@ -246,7 +246,7 @@ exports.postOrder  = (req,res,next) =>{
 
   Product.find({ '_id': { $in: productIds } }).lean().then(prods =>{
     let productItems = prods
-    console.log(prods)
+    // console.log(prods)
     userCart.forEach(p =>{
       productItems.forEach(pro =>{
         if(p.productId.toString() == pro._id.toString()){

@@ -94,7 +94,13 @@ exports.getAllProducts = async(req,res,next) => {
     
     try{
         let products = await Product.find(condition).limit(limit).skip((page-1)*limit).sort({price:"asc"});
-        res.status(200).send(products)
+        const number = await Product.countDocuments(condition);
+        let body = {
+           products : products,
+           totalCount : number  
+        }
+        res.status(200).send(body);
+
     }catch(e){
         res.status(400).send(e);
     }
@@ -157,12 +163,18 @@ exports.editProduct = (req,res,next)=>{
 exports.deleteProduct = (req,res,next) =>{
 
     const productId = req.query.id;
-
+    
     if(!productId){
         return res.status(400).send('Please provide Product Id')
     }
     Product.findByIdAndDelete(productId).then(resp=>{
-        res.status(200).send('Product Deleted Successfully');
+        // console.log(resp)
+        if(resp){
+            res.status(200).send({message:'Product Deleted Successfully'});
+        }else{
+            res.status(200).send({message:'No Product Found'})
+        }
+       
     }).catch(err=>{
         res.status(400).send(err);
     });
